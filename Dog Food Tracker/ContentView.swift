@@ -48,21 +48,33 @@ struct ContentView: View {
                             }
                         }) {
                             HStack {
-                                Image(systemName: "bowl.fill")
+                                Image(systemName: "fork.knife.circle.fill")
                                     .font(.system(size: 24))
                                 Text("Record Feeding")
                                     .font(.headline)
                             }
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
-                            .frame(height: 60) // Larger than 44pt minimum
-                            .background(Color.accentColor)
+                            .frame(height: 60)
+                            .background(cloudKit.isInitialized ? Color.accentColor : Color.gray)
                             .cornerRadius(15)
                             .shadow(radius: 2, y: 1)
                         }
-                        .disabled(isSaving)
+                        .disabled(isSaving || !cloudKit.isInitialized)
                         .padding(.horizontal, 20)
                         .padding(.top, 20)
+                        
+                        // Add a loading indicator if not initialized
+                        if !cloudKit.isInitialized {
+                            HStack {
+                                ProgressView()
+                                    .scaleEffect(0.8)
+                                Text("Setting up...")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding(.top, 4)
+                        }
                         
                         // Recent Feedings Section
                         VStack(alignment: .leading, spacing: 16) {
@@ -89,13 +101,23 @@ struct ContentView: View {
                             }
                             .padding(.horizontal, 20)
                             
-                            if cloudKit.feedingRecords.isEmpty {
+                            if cloudKit.isLoading {
+                                VStack(spacing: 16) {
+                                    ProgressView()
+                                        .scaleEffect(1.5)
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 40)
+                                    Text("Loading feedings...")
+                                        .font(.system(size: 17))
+                                        .foregroundColor(.secondary)
+                                }
+                            } else if cloudKit.feedingRecords.isEmpty {
                                 VStack(spacing: 16) {
                                     Image(systemName: "bowl")
                                         .font(.system(size: 48))
                                         .foregroundColor(.secondary)
                                     Text("No feedings recorded yet")
-                                        .font(.system(size: 17)) // At least 11pt
+                                        .font(.system(size: 17))
                                         .foregroundColor(.secondary)
                                 }
                                 .frame(maxWidth: .infinity)
@@ -197,7 +219,7 @@ struct FeedingRecordView: View {
                 
                 Spacer()
                 
-                Image(systemName: "bowl.fill")
+                Image(systemName: "fork.knife")
                     .font(.system(size: 20))
                     .foregroundColor(.secondary)
             }

@@ -6,59 +6,119 @@ struct SetupView: View {
     @State private var tempPetName = ""
     
     var body: some View {
-        VStack(spacing: 32) {
-            VStack(spacing: 16) {
-                Text("Welcome to Dog Feeding Tracker")
-                    .font(.system(size: 28, weight: .bold))
-                    .multilineTextAlignment(.center)
-                
-                Text("Please enter your details to get started")
-                    .font(.system(size: 17))
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-            }
-            .padding(.top, 40)
-            
-            VStack(spacing: 20) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Your Name")
-                        .font(.headline)
-                    TextField("Enter your name", text: $tempUserName)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .font(.system(size: 17))
-                        .frame(height: 44)
+        NavigationView {
+            ScrollView {
+                VStack(spacing: 24) {
+                    VStack(spacing: 12) {
+                        DogWelcomeSymbol()
+                            .frame(width: 120, height: 120)
+                        
+                        Text("Welcome to\nDog Feeding Tracker")
+                            .font(.system(size: 28, weight: .bold))
+                            .multilineTextAlignment(.center)
+                            .lineSpacing(4)
+                        
+                        Text("Keep track of when your furry friend has been fed")
+                            .font(.system(size: 17))
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding(.top, 12)
+                    
+                    VStack(spacing: 24) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("Your Name", systemImage: "person.fill")
+                                .font(.headline)
+                            
+                            TextField("Enter your name", text: $tempUserName)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .font(.system(size: 17))
+                                .frame(height: 44)
+                                .textContentType(.name)
+                                .autocapitalization(.words)
+                        }
+                        
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("Dog's Name", systemImage: "pawprint.fill")
+                                .font(.headline)
+                            
+                            TextField("Enter dog's name", text: $tempPetName)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .font(.system(size: 17))
+                                .frame(height: 44)
+                                .autocapitalization(.words)
+                        }
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 20)
+                    .background(Color(UIColor.secondarySystemGroupedBackground))
+                    .cornerRadius(16)
+                    .padding(.horizontal, 20)
+                    
+                    Button(action: {
+                        guard !tempUserName.isEmpty && !tempPetName.isEmpty else { return }
+                        userPrefs.userName = tempUserName
+                        userPrefs.petName = tempPetName
+                    }) {
+                        HStack {
+                            Text("Get Started")
+                                .font(.headline)
+                            Image(systemName: "arrow.right.circle.fill")
+                                .font(.system(size: 20))
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 56)
+                        .background(
+                            !tempUserName.isEmpty && !tempPetName.isEmpty ?
+                            Color.accentColor : Color.gray
+                        )
+                        .cornerRadius(16)
+                        .shadow(radius: 2, y: 1)
+                    }
+                    .disabled(tempUserName.isEmpty || tempPetName.isEmpty)
+                    .padding(.horizontal, 20)
+                    
+                    Spacer(minLength: 20)
                 }
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Dog's Name")
-                        .font(.headline)
-                    TextField("Enter dog's name", text: $tempPetName)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .font(.system(size: 17))
-                        .frame(height: 44)
-                }
+                .padding(.bottom, 20)
             }
-            .padding(.horizontal, 20)
-            
-            Button(action: {
-                guard !tempUserName.isEmpty && !tempPetName.isEmpty else { return }
-                userPrefs.userName = tempUserName
-                userPrefs.petName = tempPetName
-            }) {
-                Text("Continue")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 50)
-                    .background(Color.blue)
-                    .cornerRadius(12)
-            }
-            .disabled(tempUserName.isEmpty || tempPetName.isEmpty)
-            .padding(.horizontal, 20)
-            .padding(.top, 20)
-            
-            Spacer()
+            .navigationBarHidden(true)
         }
-        .padding()
+    }
+}
+
+struct DogWelcomeSymbol: View {
+    var body: some View {
+        ZStack {
+            // Background circle
+            Circle()
+                .fill(Color.accentColor.opacity(0.1))
+            
+            // Dog symbols composition
+            VStack(spacing: -5) {
+                HStack(spacing: 3) {
+                    Image(systemName: "pawprint.fill")
+                        .font(.system(size: 20))
+                        .rotationEffect(.degrees(-30))
+                    Image(systemName: "pawprint.fill")
+                        .font(.system(size: 20))
+                        .rotationEffect(.degrees(30))
+                }
+                
+                Image(systemName: "heart.circle.fill")
+                    .font(.system(size: 50))
+                
+                HStack(spacing: 3) {
+                    Image(systemName: "pawprint.fill")
+                        .font(.system(size: 20))
+                        .rotationEffect(.degrees(-30))
+                    Image(systemName: "pawprint.fill")
+                        .font(.system(size: 20))
+                        .rotationEffect(.degrees(30))
+                }
+            }
+            .foregroundColor(.accentColor)
+        }
     }
 } 

@@ -14,6 +14,7 @@ class CloudKitManager: ObservableObject {
     @Published var isAuthenticated = false
     @Published var errorMessage: String?
     @Published var isInitialized = false
+    @Published var isLoading = false
     
     private init() {
         self.database = container.privateCloudDatabase
@@ -260,6 +261,9 @@ class CloudKitManager: ObservableObject {
     }
     
     func fetchRecentRecords() async throws {
+        isLoading = true
+        defer { isLoading = false }
+        
         guard isAuthenticated else {
             throw NSError(domain: "", code: -1, 
                          userInfo: [NSLocalizedDescriptionKey: "Please sign in to iCloud to use this feature"])
